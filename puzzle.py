@@ -42,9 +42,13 @@ class Puzzle:
         return (x, y)
 
     def layout_fits(self, layout, position):
+        # redundant
+        if self.is_occupied((position[0], position[1])):
+            return False
+
         for block in layout.blocks:
-            x = layout[0] + block[0]
-            y = layout[1] + block[1]
+            x = position[0] + block[0]
+            y = position[1] + block[1]
 
             # check puzzle boundaries
             if x < 0 or x >= self.m:
@@ -58,6 +62,8 @@ class Puzzle:
 
     def add_piece(self, piece_id, layout_id, position):
 
+        # add origin
+        self.occupied.add((position[0], position[1]))
         for block in pieces[piece_id].layouts[layout_id].blocks:
             x = position[0] + block[0]
             y = position[1] + block[1]
@@ -72,6 +78,8 @@ class Puzzle:
 
     def remove_piece(self, piece_id, layout_id, position):
 
+        # remove origin
+        self.occupied.remove((position[0], position[1]))
         for block in pieces[piece_id].layouts[layout_id].blocks:
             x = position[0] + block[0]
             y = position[1] + block[1]
@@ -83,6 +91,28 @@ class Puzzle:
         # pieces on the board
         # piece id => (layout id, position)
         del self.solution[piece_id]
+
+    def __str__(self):
+        # init empty grid
+        grid = [ ['.'] * self.m for i in range(self.n)]
+
+        # set occupied blocks
+        for cell in self.occupied:
+            grid[cell[1]][cell[0]] = 'X'
+
+        # mark pieces used in solution
+        for piece_id, layout_position in self.solution.items():
+            grid[layout_position[1][1]][layout_position[1][0]] = str(piece_id)
+            for cell in self.pieces[piece_id].layouts[layout_position[0]].blocks:
+                grid[cell[1] + layout_position[1][1]][cell[0] + layout_position[1][0]] = str(piece_id)
+
+        # create string from grid
+        repres = ""
+        for row in grid:
+            for cell in row:
+                repres = f"{repres}{cell}"
+            repres = f"{repres}\n"
+        return repres
 
 # TODO: create copy, or cleanup intermediate solutions?
 def solve(current_position, current_puzzle):
@@ -98,7 +128,12 @@ def solve(current_position, current_puzzle):
         pass
 
 if __name__ == '__main__':
-    pieces = [Piece([Layout([(0, 1)]), Layout([(0, 1), (1, 1)])])]
+    pieces = [Piece([Layout([])]), Piece([Layout([(0, 1)]), Layout([(0, 1), (1, 1)])])]
     p = Puzzle(3, 3, pieces)
 
+    p.add_piece(0, 0, (2, 1))
+    print(p.layout_fits(p.pieces[1].layouts[1], (1, 1)))
+    p.add_piece(1, 1, (1, 1))
     print(p.is_occupied((0, 0)))
+
+    print(p)
