@@ -12,6 +12,7 @@ class Layout:
 @dataclass
 class Piece:
     layouts: list[Layout]
+    representation: str
 
 class Puzzle:
     def __init__(self, m, n, pieces):
@@ -102,9 +103,10 @@ class Puzzle:
 
         # mark pieces used in solution
         for piece_id, layout_position in self.solution.items():
-            grid[layout_position[1][1]][layout_position[1][0]] = str(piece_id)
+            grid[layout_position[1][1]][layout_position[1][0]] = self.pieces[piece_id].representation
             for cell in self.pieces[piece_id].layouts[layout_position[0]].blocks:
-                grid[cell[1] + layout_position[1][1]][cell[0] + layout_position[1][0]] = str(piece_id)
+                grid[cell[1] + layout_position[1][1]][cell[0] + layout_position[1][0]] = \
+                    self.pieces[piece_id].representation
 
         # create string from grid
         repres = ""
@@ -128,7 +130,7 @@ def solve(current_position, current_puzzle):
         pass
 
 if __name__ == '__main__':
-    pieces = [Piece([Layout([])]), Piece([Layout([(0, 1)]), Layout([(0, 1), (1, 1)])])]
+    pieces = [Piece([Layout([])], 'A'), Piece([Layout([(0, 1)]), Layout([(0, 1), (1, 1)])], 'B')]
     p = Puzzle(3, 3, pieces)
 
     p.add_piece(0, 0, (2, 1))
