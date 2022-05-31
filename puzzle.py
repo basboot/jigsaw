@@ -136,59 +136,48 @@ class Puzzle:
         return repres
 
 def solve(current_tile, puzzle, last_piece_id):
-    if puzzle.is_solved():
-        print("solved1")
-        return puzzle.solution
-    print(f"solve {current_tile}")
-
-    if puzzle.is_occupied(current_tile):
-        # this tile is already occupied, so we can move to the next
+    if not puzzle.is_solved() and puzzle.is_occupied(current_tile):
+        # this tile is already occupied, but the puzzle is unfinished,
+        # so we can move to the next
         solve(puzzle.next_tile(current_tile), puzzle, last_piece_id)
-        if puzzle.is_solved():
-            print("solved4")
-            return puzzle.solution
     else:
         # this tile is not occupied, so we try all pieces in all layouts
         for piece_id in range(len(puzzle.pieces)):
-            print(f"try piece {piece_id}")
-            # skip pieces already used in the solution
-            if piece_id in puzzle.solution:
-                continue
             for layout_id in range(len(puzzle.pieces[piece_id].layouts)):
-                print(f"try layout {layout_id}")
+                # skip pieces already used in the solution
+                if piece_id in puzzle.solution:
+                    continue
                 if puzzle.layout_fits(puzzle.pieces[piece_id].layouts[layout_id], current_tile):
-                    print("FIT")
                     # piece fits, so use it
                     puzzle.add_piece(piece_id, layout_id, current_tile)
-
+                    # and solve next
                     solve(puzzle.next_tile(current_tile), puzzle, piece_id)
 
-                if puzzle.is_solved():
-                    print("solved2")
-                    return puzzle.solution
-
-        if puzzle.is_solved():
-            print("solved3")
-            return puzzle.solution
-
-
+    if not puzzle.is_solved():
         # none of the pieces fit anywhere, backtrack
         # remove last piece from solution
         print(f"BACKTRACK, remove {last_piece_id}")
         puzzle.remove_piece(last_piece_id, puzzle.solution[last_piece_id][0], puzzle.solution[last_piece_id][1])
+    else:
+        return puzzle.solution
 
 if __name__ == '__main__':
     pieces = [
         Piece([Layout([])], 'A'),
-        Piece([Layout([(1, 0), (1, 1)]), Layout([(1, -1), (1, 0)]), Layout([(0, 1), (1, 1)]), Layout([(1, 0), (0, 1)])], 'B'),
-        Piece([Layout([(0, 1), (0, 2), (-1, 2)]), Layout([(0, 1), (1, 1), (2, 1)]), Layout([(1, 0), (0, 1), (0, 2)]),
-               Layout([(1, 0), (2, 0), (2, -1)]), Layout([(0, 1), (0, 2), (1, 2)]), Layout([(1, 0), (2, 0), (2, -1)]),
-               Layout([(1, 0), (1, 1), (1, 2)]), Layout([(0, 1), (1, 1), (2, 1)])], 'C')
+        Piece([Layout([(0, 1)]), Layout([(1, 0)])], 'B')
     ]
 
-    p = Puzzle(3, 3, pieces)
+    # pieces = [
+    #     Piece([Layout([])], 'A'),
+    #     Piece([Layout([(1, 0), (1, 1)]), Layout([(1, -1), (1, 0)]), Layout([(0, 1), (1, 1)]), Layout([(1, 0), (0, 1)])], 'B'),
+    #     Piece([Layout([(0, 1), (0, 2), (-1, 2)]), Layout([(0, 1), (1, 1), (2, 1)]), Layout([(1, 0), (0, 1), (0, 2)]),
+    #            Layout([(1, 0), (2, 0), (2, -1)]), Layout([(0, 1), (0, 2), (1, 2)]), Layout([(1, 0), (2, 0), (2, -1)]),
+    #            Layout([(1, 0), (1, 1), (1, 2)]), Layout([(0, 1), (1, 1), (2, 1)])], 'C')
+    # ]
 
-    p.invalidate((1, 1))
+    p = Puzzle(2, 2, pieces)
+
+    p.invalidate((1, 0))
 
     print(solve((0, 0), p, None))
     print(p)
