@@ -135,17 +135,15 @@ class Puzzle:
             repres = f"{repres}\n"
         return repres
 
-# TODO: create copy, or cleanup intermediate solutions?
-# TODO: rename to tile
-def solve(current_position, puzzle, last_piece_id):
+def solve(current_tile, puzzle, last_piece_id):
     if puzzle.is_solved():
         print("solved1")
         return puzzle.solution
-    print(f"solve {current_position}")
+    print(f"solve {current_tile}")
 
-    if puzzle.is_occupied(current_position):
+    if puzzle.is_occupied(current_tile):
         # this tile is already occupied, so we can move to the next
-        solve(puzzle.next_tile(current_position), puzzle, last_piece_id)
+        solve(puzzle.next_tile(current_tile), puzzle, last_piece_id)
         if puzzle.is_solved():
             print("solved4")
             return puzzle.solution
@@ -158,12 +156,12 @@ def solve(current_position, puzzle, last_piece_id):
                 continue
             for layout_id in range(len(puzzle.pieces[piece_id].layouts)):
                 print(f"try layout {layout_id}")
-                if puzzle.layout_fits(puzzle.pieces[piece_id].layouts[layout_id], current_position):
+                if puzzle.layout_fits(puzzle.pieces[piece_id].layouts[layout_id], current_tile):
                     print("FIT")
                     # piece fits, so use it
-                    puzzle.add_piece(piece_id, layout_id, current_position)
+                    puzzle.add_piece(piece_id, layout_id, current_tile)
 
-                    solve(puzzle.next_tile(current_position), puzzle, piece_id)
+                    solve(puzzle.next_tile(current_tile), puzzle, piece_id)
 
                 if puzzle.is_solved():
                     print("solved2")
