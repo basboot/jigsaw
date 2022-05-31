@@ -17,14 +17,18 @@ from dataclasses import dataclass
 
 # (0, 0) is top left, + is right/down
 # the origin does not have to be specified in the list of blocks
+
+
 @dataclass
 class Layout:
     blocks: list[tuple]
+
 
 @dataclass
 class Piece:
     layouts: list[Layout]
     representation: str
+
 
 class Puzzle:
     def __init__(self, m, n, pieces):
@@ -55,7 +59,7 @@ class Puzzle:
             x = 0
         # not protected against wrong values, because the solver should handle it
 
-        return (x, y)
+        return x, y
 
     def layout_fits(self, layout, tile):
         # redundant
@@ -80,7 +84,7 @@ class Puzzle:
 
         # add origin
         self.occupied.add((tile_origin[0], tile_origin[1]))
-        for block in pieces[piece_id].layouts[layout_id].blocks:
+        for block in self.pieces[piece_id].layouts[layout_id].blocks:
             x = tile_origin[0] + block[0]
             y = tile_origin[1] + block[1]
 
@@ -96,7 +100,7 @@ class Puzzle:
 
         # remove origin
         self.occupied.remove((tile_origin[0], tile_origin[1]))
-        for block in pieces[piece_id].layouts[layout_id].blocks:
+        for block in self.pieces[piece_id].layouts[layout_id].blocks:
             x = tile_origin[0] + block[0]
             y = tile_origin[1] + block[1]
 
@@ -114,7 +118,7 @@ class Puzzle:
 
     def __str__(self):
         # init empty grid
-        grid = [ ['.'] * self.m for i in range(self.n)]
+        grid = [['.'] * self.m for _ in range(self.n)]
 
         # set occupied blocks
         for tile in self.occupied:
@@ -135,6 +139,7 @@ class Puzzle:
             repres = f"{repres}\n"
         return repres
 
+
 def solve(current_tile, puzzle, last_piece_id):
     print(f"try tile {current_tile}")
     if puzzle.is_occupied(current_tile):
@@ -148,7 +153,7 @@ def solve(current_tile, puzzle, last_piece_id):
         for piece_id in range(len(puzzle.pieces)):
             for layout_id in range(len(puzzle.pieces[piece_id].layouts)):
                 # skip pieces already used in the solution
-                if piece_id in puzzle.solution: # this needs to be changed if we want to find ALL solutions
+                if piece_id in puzzle.solution:  # this needs to be changed if we want to find ALL solutions
                     continue
                 print(f"try piece - layout {piece_id} - {layout_id}")
                 if puzzle.layout_fits(puzzle.pieces[piece_id].layouts[layout_id], current_tile):
@@ -169,21 +174,23 @@ def solve(current_tile, puzzle, last_piece_id):
     else:
         return puzzle.solution
 
+
 if __name__ == '__main__':
-    # pieces = [
+    # puzzle_pieces = [
     #     Piece([Layout([])], 'A'),
     #     Piece([Layout([(0, 1)]), Layout([(1, 0)])], 'B')
     # ]
 
-    pieces = [
+    puzzle_pieces = [
         Piece([Layout([])], 'A'),
-        Piece([Layout([(1, 0), (1, 1)]), Layout([(1, -1), (1, 0)]), Layout([(0, 1), (1, 1)]), Layout([(1, 0), (0, 1)])], 'B'),
+        Piece([Layout([(1, 0), (1, 1)]), Layout([(1, -1), (1, 0)]), Layout([(0, 1), (1, 1)]),
+               Layout([(1, 0), (0, 1)])], 'B'),
         Piece([Layout([(0, 1), (0, 2), (-1, 2)]), Layout([(0, 1), (1, 1), (2, 1)]), Layout([(1, 0), (0, 1), (0, 2)]),
                Layout([(1, 0), (2, 0), (2, -1)]), Layout([(0, 1), (0, 2), (1, 2)]), Layout([(1, 0), (2, 0), (2, -1)]),
                Layout([(1, 0), (1, 1), (1, 2)]), Layout([(0, 1), (1, 1), (2, 1)])], 'C')
     ]
 
-    p = Puzzle(3, 3, pieces)
+    p = Puzzle(3, 3, puzzle_pieces)
 
     p.invalidate((2, 2))
 
