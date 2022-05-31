@@ -146,6 +146,9 @@ def solve(current_position, puzzle, last_piece_id):
     if puzzle.is_occupied(current_position):
         # this tile is already occupied, so we can move to the next
         solve(puzzle.next_tile(current_position), puzzle, last_piece_id)
+        if puzzle.is_solved():
+            print("solved4")
+            return puzzle.solution
     else:
         # this tile is not occupied, so we try all pieces in all layouts
         for piece_id in range(len(puzzle.pieces)):
@@ -184,7 +187,7 @@ if __name__ == '__main__':
 
     p = Puzzle(2, 2, pieces)
 
-    p.invalidate((1, 0))
+    p.invalidate((0, 0))
 
     print(solve((0, 0), p, None))
     print(p)
