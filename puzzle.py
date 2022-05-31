@@ -1,9 +1,21 @@
 from dataclasses import dataclass
 
+# A puzzle is a square bord with m x n tiles, which can be empty or occupied
+# A piece of the puzzle is a shape of blocks. Each block can occupy a tile
+# Because a piece kan be rotated and flipped it has multiple layouts, which
+# do not have to be unique because of symmetry. Which results in 1 to 8 unique
+# layouts per piece.
+
+# The target is to occupy all tiles of the board but some. By invalidating
+# (occupy!) the q tiles that cannot be used, and using pieces with a total
+# number of blocks of m x n - q the problem reduces to putting all pieces
+# of the puzzle on the board without overlapping.
+
+# If we choose the origin (0, 0) of a layout to have no blocks above or left
+# from it, we can solve the puzzle by trying all pieces to fill the puzzle
+# from top left, to bottom right
+
 # (0, 0) is top left, + is right/down
-
-
-# origin (0, 0) of a layout must have no block above or left from it
 # the origin does not have to be specified in the list of blocks
 @dataclass
 class Layout:
@@ -27,12 +39,12 @@ class Puzzle:
         # piece id => (layout id, position)
         self.solution = {}
 
-    def is_occupied(self, point):
-        return point in self.occupied
+    def is_occupied(self, tile):
+        return tile in self.occupied
 
-    def next_block(self, position):
-        x = position[0]
-        y = position[1]
+    def next_tile(self, tile):
+        x = tile[0]
+        y = tile[1]
 
         x += 1
         if x == self.m:
@@ -42,14 +54,14 @@ class Puzzle:
 
         return (x, y)
 
-    def layout_fits(self, layout, position):
+    def layout_fits(self, layout, tile):
         # redundant
-        if self.is_occupied((position[0], position[1])):
+        if self.is_occupied((tile[0], tile[1])):
             return False
 
         for block in layout.blocks:
-            x = position[0] + block[0]
-            y = position[1] + block[1]
+            x = tile[0] + block[0]
+            y = tile[1] + block[1]
 
             # check puzzle boundaries
             if x < 0 or x >= self.m:
@@ -61,13 +73,13 @@ class Puzzle:
 
         return True
 
-    def add_piece(self, piece_id, layout_id, position):
+    def add_piece(self, piece_id, layout_id, tile_origin):
 
         # add origin
-        self.occupied.add((position[0], position[1]))
+        self.occupied.add((tile_origin[0], tile_origin[1]))
         for block in pieces[piece_id].layouts[layout_id].blocks:
-            x = position[0] + block[0]
-            y = position[1] + block[1]
+            x = tile_origin[0] + block[0]
+            y = tile_origin[1] + block[1]
 
             # TODO: add asserts
             # add to occupied
@@ -75,15 +87,15 @@ class Puzzle:
 
         # pieces on the board
         # piece id => (layout id, position)
-        self.solution[piece_id] = (layout_id, position)
+        self.solution[piece_id] = (layout_id, tile_origin)
 
-    def remove_piece(self, piece_id, layout_id, position):
+    def remove_piece(self, piece_id, layout_id, tile_origin):
 
         # remove origin
-        self.occupied.remove((position[0], position[1]))
+        self.occupied.remove((tile_origin[0], tile_origin[1]))
         for block in pieces[piece_id].layouts[layout_id].blocks:
-            x = position[0] + block[0]
-            y = position[1] + block[1]
+            x = tile_origin[0] + block[0]
+            y = tile_origin[1] + block[1]
 
             # TODO: add asserts
             # add to occupied
@@ -98,21 +110,21 @@ class Puzzle:
         grid = [ ['.'] * self.m for i in range(self.n)]
 
         # set occupied blocks
-        for cell in self.occupied:
-            grid[cell[1]][cell[0]] = 'X'
+        for tile in self.occupied:
+            grid[tile[1]][tile[0]] = 'X'
 
         # mark pieces used in solution
         for piece_id, layout_position in self.solution.items():
             grid[layout_position[1][1]][layout_position[1][0]] = self.pieces[piece_id].representation
-            for cell in self.pieces[piece_id].layouts[layout_position[0]].blocks:
-                grid[cell[1] + layout_position[1][1]][cell[0] + layout_position[1][0]] = \
+            for tile in self.pieces[piece_id].layouts[layout_position[0]].blocks:
+                grid[tile[1] + layout_position[1][1]][tile[0] + layout_position[1][0]] = \
                     self.pieces[piece_id].representation
 
         # create string from grid
         repres = ""
         for row in grid:
-            for cell in row:
-                repres = f"{repres}{cell}"
+            for tile in row:
+                repres = f"{repres}{tile}"
             repres = f"{repres}\n"
         return repres
 
