@@ -136,7 +136,9 @@ class Puzzle:
         return repres
 
 def solve(current_tile, puzzle, last_piece_id):
+    print(f"try tile {current_tile}")
     if puzzle.is_occupied(current_tile):
+        print(f"occupied")
         # this tile is already occupied,
         # so we can move to the next, if there is still one left
         if not puzzle.is_solved():
@@ -148,37 +150,42 @@ def solve(current_tile, puzzle, last_piece_id):
                 # skip pieces already used in the solution
                 if piece_id in puzzle.solution: # this needs to be changed if we want to find ALL solutions
                     continue
+                print(f"try piece - layout {piece_id} - {layout_id}")
                 if puzzle.layout_fits(puzzle.pieces[piece_id].layouts[layout_id], current_tile):
+                    print("FIT")
                     # piece fits, so use it
                     puzzle.add_piece(piece_id, layout_id, current_tile)
                     # and solve next
                     solve(puzzle.next_tile(current_tile), puzzle, piece_id)
+                    print(f"after solve piece - layout {piece_id} - {layout_id}")
 
     if not puzzle.is_solved():
         # none of the pieces fit anywhere, backtrack
         # remove last piece from solution
         print(f"BACKTRACK, remove {last_piece_id}")
-        puzzle.remove_piece(last_piece_id, puzzle.solution[last_piece_id][0], puzzle.solution[last_piece_id][1])
+        # TODO: check if this is valid (double removed occurs because of skipping when occupied)
+        if last_piece_id in puzzle.solution:
+            puzzle.remove_piece(last_piece_id, puzzle.solution[last_piece_id][0], puzzle.solution[last_piece_id][1])
     else:
         return puzzle.solution
 
 if __name__ == '__main__':
-    pieces = [
-        Piece([Layout([])], 'A'),
-        Piece([Layout([(0, 1)]), Layout([(1, 0)])], 'B')
-    ]
-
     # pieces = [
     #     Piece([Layout([])], 'A'),
-    #     Piece([Layout([(1, 0), (1, 1)]), Layout([(1, -1), (1, 0)]), Layout([(0, 1), (1, 1)]), Layout([(1, 0), (0, 1)])], 'B'),
-    #     Piece([Layout([(0, 1), (0, 2), (-1, 2)]), Layout([(0, 1), (1, 1), (2, 1)]), Layout([(1, 0), (0, 1), (0, 2)]),
-    #            Layout([(1, 0), (2, 0), (2, -1)]), Layout([(0, 1), (0, 2), (1, 2)]), Layout([(1, 0), (2, 0), (2, -1)]),
-    #            Layout([(1, 0), (1, 1), (1, 2)]), Layout([(0, 1), (1, 1), (2, 1)])], 'C')
+    #     Piece([Layout([(0, 1)]), Layout([(1, 0)])], 'B')
     # ]
 
-    p = Puzzle(2, 2, pieces)
+    pieces = [
+        Piece([Layout([])], 'A'),
+        Piece([Layout([(1, 0), (1, 1)]), Layout([(1, -1), (1, 0)]), Layout([(0, 1), (1, 1)]), Layout([(1, 0), (0, 1)])], 'B'),
+        Piece([Layout([(0, 1), (0, 2), (-1, 2)]), Layout([(0, 1), (1, 1), (2, 1)]), Layout([(1, 0), (0, 1), (0, 2)]),
+               Layout([(1, 0), (2, 0), (2, -1)]), Layout([(0, 1), (0, 2), (1, 2)]), Layout([(1, 0), (2, 0), (2, -1)]),
+               Layout([(1, 0), (1, 1), (1, 2)]), Layout([(0, 1), (1, 1), (2, 1)])], 'C')
+    ]
 
-    p.invalidate((1, 0))
+    p = Puzzle(3, 3, pieces)
+
+    p.invalidate((2, 2))
 
     print(solve((0, 0), p, None))
     print(p)
