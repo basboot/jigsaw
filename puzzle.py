@@ -180,12 +180,15 @@ def solve(current_tile, puzzle, last_piece_id):
 if __name__ == '__main__':
     pieces = [
         Piece([Layout([])], 'A'),
-        Piece([Layout([(0, 1)]), Layout([(1, 0)])], 'B')
+        Piece([Layout([(1, 0), (1, 1)]), Layout([(1, -1), (1, 0)]), Layout([(0, 1), (1, 1)]), Layout([(1, 0), (0, 1)])], 'B'),
+        Piece([Layout([(0, 1), (0, 2), (-1, 2)]), Layout([(0, 1), (1, 1), (2, 1)]), Layout([(1, 0), (0, 1), (0, 2)]),
+               Layout([(1, 0), (2, 0), (2, -1)]), Layout([(0, 1), (0, 2), (1, 2)]), Layout([(1, 0), (2, 0), (2, -1)]),
+               Layout([(1, 0), (1, 1), (1, 2)]), Layout([(0, 1), (1, 1), (2, 1)])], 'C')
     ]
 
-    p = Puzzle(2, 2, pieces)
+    p = Puzzle(3, 3, pieces)
 
-    p.invalidate((0, 0))
+    p.invalidate((1, 1))
 
     print(solve((0, 0), p, None))
     print(p)
