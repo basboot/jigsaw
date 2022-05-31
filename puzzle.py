@@ -136,16 +136,17 @@ class Puzzle:
         return repres
 
 def solve(current_tile, puzzle, last_piece_id):
-    if not puzzle.is_solved() and puzzle.is_occupied(current_tile):
-        # this tile is already occupied, but the puzzle is unfinished,
-        # so we can move to the next
-        solve(puzzle.next_tile(current_tile), puzzle, last_piece_id)
+    if puzzle.is_occupied(current_tile):
+        # this tile is already occupied,
+        # so we can move to the next, if there is still one left
+        if not puzzle.is_solved():
+            solve(puzzle.next_tile(current_tile), puzzle, last_piece_id)
     else:
         # this tile is not occupied, so we try all pieces in all layouts
         for piece_id in range(len(puzzle.pieces)):
             for layout_id in range(len(puzzle.pieces[piece_id].layouts)):
                 # skip pieces already used in the solution
-                if piece_id in puzzle.solution:
+                if piece_id in puzzle.solution: # this needs to be changed if we want to find ALL solutions
                     continue
                 if puzzle.layout_fits(puzzle.pieces[piece_id].layouts[layout_id], current_tile):
                     # piece fits, so use it
