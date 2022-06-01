@@ -80,7 +80,7 @@ class Puzzle:
             x = tile_origin[0] + block[0]
             y = tile_origin[1] + block[1]
 
-            # TODO: add asserts
+            assert (x, y) not in self.occupied, f"Cannot put tile on ({x},{y}) because it is already occupied"
             # add to occupied
             self.occupied.add((x, y))
 
@@ -96,7 +96,7 @@ class Puzzle:
             x = tile_origin[0] + block[0]
             y = tile_origin[1] + block[1]
 
-            # TODO: add asserts
+            assert (x, y) in self.occupied, f"Cannot remove tile from ({x},{y}) because it is not occupied"
             # add to occupied
             self.occupied.remove((x, y))
 
@@ -124,23 +124,21 @@ class Puzzle:
                     self.pieces[piece_id].representation
 
         # create string from grid
-        repres = ""
-        for row in grid:
-            for tile in row:
-                repres = f"{repres}{tile}"
-            repres = f"{repres}\n"
-        return repres
+        representation = ""
+        for puzzle_row in grid:
+            for tile in puzzle_row:
+                representation = f"{representation}{tile}"
+            representation = f"{representation}\n"
+        return representation
 
 
-# TODO: laatste stuk niet meer doorgeven, maar na 'solve' opruimen
-# TODO; check is dan niet meer nodig, voorkomt overslaat van layouts en maakt yield mogelijk
 def solve(current_tile, puzzle):
     print(f"try tile {current_tile}")
     # No tiles left, so return solution, even if there isn't any
     if not puzzle.has_next_tile(current_tile):
         return puzzle.is_solved(), puzzle.solution
     else:
-        # curent tile is already occupied, so try next
+        # current tile is already occupied, so skip and go to next
         if puzzle.is_occupied(current_tile):
             return solve(puzzle.next_tile(current_tile), puzzle)
         else:
@@ -168,6 +166,7 @@ def solve(current_tile, puzzle):
             # None of the pieces fits, so we cannot return a solution
             return False, None
 
+
 if __name__ == '__main__':
     # puzzle_pieces = [
     #     Piece([Layout([])], 'A'),
@@ -189,4 +188,3 @@ if __name__ == '__main__':
 
     print(solve((0, 0), p))
     print(p)
-
