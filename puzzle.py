@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from piece import *
 
 # A puzzle is a square bord with m x n tiles, which can be empty or occupied
 # A piece of the puzzle is a shape of blocks. Each block can occupy a tile
@@ -17,17 +17,6 @@ from dataclasses import dataclass
 
 # (0, 0) is top left, + is right/down
 # the origin does not have to be specified in the list of blocks
-
-
-@dataclass
-class Layout:
-    blocks: list[tuple]
-
-
-@dataclass
-class Piece:
-    layouts: list[Layout]
-    representation: str
 
 
 class Puzzle:
@@ -140,6 +129,8 @@ class Puzzle:
         return repres
 
 
+# TODO: laatste stuk niet meer doorgeven, maar na 'solve' opruimen
+# TODO; check is dan niet meer nodig, voorkomt overslaat van layouts en maakt yield mogelijk
 def solve(current_tile, puzzle, last_piece_id):
     print(f"try tile {current_tile}")
     if puzzle.is_occupied(current_tile):
@@ -196,3 +187,4 @@ if __name__ == '__main__':
 
     print(solve((0, 0), p, None))
     print(p)
+
