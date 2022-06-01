@@ -38,7 +38,11 @@ class Puzzle:
     def is_solved(self):
         return len(self.pieces) == len(self.solution)
 
+    def has_next_tile(self, tile):
+        return tile[0] < self.m and tile[1] < self.n
+
     def next_tile(self, tile):
+        assert self.has_next_tile(tile), "There is no next tile."
         x = tile[0]
         y = tile[1]
 
@@ -46,7 +50,6 @@ class Puzzle:
         if x == self.m:
             y = y + 1
             x = 0
-        # not protected against wrong values, because the solver should handle it
 
         return x, y
 
@@ -133,36 +136,37 @@ class Puzzle:
 # TODO; check is dan niet meer nodig, voorkomt overslaat van layouts en maakt yield mogelijk
 def solve(current_tile, puzzle):
     print(f"try tile {current_tile}")
-    if puzzle.is_solved():
-        return puzzle.solution
+    # No tiles left, so return solution, even if there isn't any
+    if not puzzle.has_next_tile(current_tile):
+        return puzzle.is_solved(), puzzle.solution
     else:
-        # move to next unoccupied space
-        while puzzle.is_occupied(current_tile):
-            current_tile = puzzle.next_tile(current_tile)
+        # curent tile is already occupied, so try next
+        if puzzle.is_occupied(current_tile):
+            return solve(puzzle.next_tile(current_tile), puzzle)
+        else:
+            # this tile is not occupied, so we try all pieces in all layouts
+            for piece_id in range(len(puzzle.pieces)):
+                # skip pieces already used in the solution
+                if piece_id in puzzle.solution:
+                    continue
+                for layout_id in range(len(puzzle.pieces[piece_id].layouts)):
+                    print(f"try piece - layout {piece_id} - {layout_id}")
+                    if puzzle.layout_fits(puzzle.pieces[piece_id].layouts[layout_id], current_tile):
+                        print("FIT")
+                        # piece fits, so use it
+                        puzzle.add_piece(piece_id, layout_id, current_tile)
+                        # and solve next
+                        solution = solve(puzzle.next_tile(current_tile), puzzle)
 
-        # this tile is not occupied, so we try all pieces in all layouts
-        for piece_id in range(len(puzzle.pieces)):
-            # skip pieces already used in the solution
-            if piece_id in puzzle.solution:
-                continue
-            for layout_id in range(len(puzzle.pieces[piece_id].layouts)):
-                print(f"try piece - layout {piece_id} - {layout_id}")
-                if puzzle.layout_fits(puzzle.pieces[piece_id].layouts[layout_id], current_tile):
-                    print("FIT")
-                    # piece fits, so use it
-                    puzzle.add_piece(piece_id, layout_id, current_tile)
-                    # and solve next
-                    solution = solve(puzzle.next_tile(current_tile), puzzle)
-
-                    if puzzle.is_solved():
-                        # puzzle solved, return solution
-                        return solution
-                    else:
-                        # remove this piece/layout and try next (backtrack)
-                        puzzle.remove_piece(piece_id, layout_id, current_tile)
-                    print(f"after solve piece - layout {piece_id} - {layout_id}")
-        # None of the pieces fits, so we cannot return a solution
-        return None
+                        if solution[0]:
+                            # only return this solution if the puzzle has been solved
+                            return solution
+                        else:
+                            # remove this piece/layout and try next (backtrack)
+                            puzzle.remove_piece(piece_id, layout_id, current_tile)
+                        print(f"after solve piece - layout {piece_id} - {layout_id}")
+            # None of the pieces fits, so we cannot return a solution
+            return False, None
 
 if __name__ == '__main__':
     # puzzle_pieces = [
