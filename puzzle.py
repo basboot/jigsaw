@@ -131,40 +131,38 @@ class Puzzle:
 
 # TODO: laatste stuk niet meer doorgeven, maar na 'solve' opruimen
 # TODO; check is dan niet meer nodig, voorkomt overslaat van layouts en maakt yield mogelijk
-def solve(current_tile, puzzle, last_piece_id):
+def solve(current_tile, puzzle):
     print(f"try tile {current_tile}")
-    if puzzle.is_occupied(current_tile):
-        print(f"occupied")
-        # this tile is already occupied,
-        # so we can move to the next, if there is still one left
-        if not puzzle.is_solved():
-            solve(puzzle.next_tile(current_tile), puzzle, last_piece_id)
+    if puzzle.is_solved():
+        return puzzle.solution
     else:
+        # move to next unoccupied space
+        while puzzle.is_occupied(current_tile):
+            current_tile = puzzle.next_tile(current_tile)
+
         # this tile is not occupied, so we try all pieces in all layouts
         for piece_id in range(len(puzzle.pieces)):
+            # skip pieces already used in the solution
+            if piece_id in puzzle.solution:
+                continue
             for layout_id in range(len(puzzle.pieces[piece_id].layouts)):
-                # skip pieces already used in the solution
-                if piece_id in puzzle.solution:  # this needs to be changed if we want to find ALL solutions
-                    continue
                 print(f"try piece - layout {piece_id} - {layout_id}")
                 if puzzle.layout_fits(puzzle.pieces[piece_id].layouts[layout_id], current_tile):
                     print("FIT")
                     # piece fits, so use it
                     puzzle.add_piece(piece_id, layout_id, current_tile)
                     # and solve next
-                    solve(puzzle.next_tile(current_tile), puzzle, piece_id)
+                    solution = solve(puzzle.next_tile(current_tile), puzzle)
+
+                    if puzzle.is_solved():
+                        # puzzle solved, return solution
+                        return solution
+                    else:
+                        # remove this piece/layout and try next (backtrack)
+                        puzzle.remove_piece(piece_id, layout_id, current_tile)
                     print(f"after solve piece - layout {piece_id} - {layout_id}")
-
-    if not puzzle.is_solved():
-        # none of the pieces fit anywhere, backtrack
-        # remove last piece from solution
-        print(f"BACKTRACK, remove {last_piece_id}")
-        # TODO: check if this is valid (double removed occurs because of skipping when occupied)
-        if last_piece_id in puzzle.solution:
-            puzzle.remove_piece(last_piece_id, puzzle.solution[last_piece_id][0], puzzle.solution[last_piece_id][1])
-    else:
-        return puzzle.solution
-
+        # None of the pieces fits, so we cannot return a solution
+        return None
 
 if __name__ == '__main__':
     # puzzle_pieces = [
@@ -185,6 +183,6 @@ if __name__ == '__main__':
 
     p.invalidate((2, 2))
 
-    print(solve((0, 0), p, None))
+    print(solve((0, 0), p))
     print(p)
 
