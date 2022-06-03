@@ -173,18 +173,25 @@ if __name__ == '__main__':
     #     Piece([Layout([(0, 1)]), Layout([(1, 0)])], 'B')
     # ]
 
+    # puzzle_pieces = [
+    #     Piece([Layout([])], 'A'),
+    #     Piece([Layout([(1, 0), (1, 1)]), Layout([(1, -1), (1, 0)]), Layout([(0, 1), (1, 1)]),
+    #            Layout([(1, 0), (0, 1)])], 'B'),
+    #     Piece([Layout([(0, 1), (0, 2), (-1, 2)]), Layout([(0, 1), (1, 1), (2, 1)]), Layout([(1, 0), (0, 1), (0, 2)]),
+    #            Layout([(1, 0), (2, 0), (2, -1)]), Layout([(0, 1), (0, 2), (1, 2)]), Layout([(1, 0), (2, 0), (2, -1)]),
+    #            Layout([(1, 0), (1, 1), (1, 2)]), Layout([(0, 1), (1, 1), (2, 1)])], 'C')
+    # ]
+
     puzzle_pieces = [
-        Piece([Layout([])], 'A'),
-        Piece([Layout([(1, 0), (1, 1)]), Layout([(1, -1), (1, 0)]), Layout([(0, 1), (1, 1)]),
-               Layout([(1, 0), (0, 1)])], 'B'),
-        Piece([Layout([(0, 1), (0, 2), (-1, 2)]), Layout([(0, 1), (1, 1), (2, 1)]), Layout([(1, 0), (0, 1), (0, 2)]),
-               Layout([(1, 0), (2, 0), (2, -1)]), Layout([(0, 1), (0, 2), (1, 2)]), Layout([(1, 0), (2, 0), (2, -1)]),
-               Layout([(1, 0), (1, 1), (1, 2)]), Layout([(0, 1), (1, 1), (2, 1)])], 'C')
+        create_piece([(0, 0)], 'A'),
+        create_piece([(0, 0), (1, 0), (1, 1)], 'B'),
+        create_piece([(0, 0), (0, 1), (0, 2), (-1, 2)], 'C')
     ]
 
     p = Puzzle(3, 3, puzzle_pieces)
 
-    p.invalidate((2, 2))
+    p.invalidate((1, 1))
 
     print(solve((0, 0), p))
     print(p)
+
