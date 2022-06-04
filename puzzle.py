@@ -28,6 +28,9 @@ class Puzzle:
         # set with occupied blocks of the puzzle
         self.occupied = set()
 
+        # set with illegal tiles to use
+        self.invalidated = set()
+
         # pieces on the board
         # piece id => (layout id, position)
         self.solution = {}
@@ -106,6 +109,7 @@ class Puzzle:
 
     # invalidate illegal tiles
     def invalidate(self, tile):
+        self.invalidated.add(tile)
         self.occupied.add(tile)
 
     def __str__(self):
@@ -154,6 +158,7 @@ def solve(current_tile, puzzle):
                         #print("FIT")
                         # piece fits, so use it
                         puzzle.add_piece(piece_id, layout_id, current_tile)
+                        print(f"Piece added: {puzzle.solution}")
                         # and solve next
                         solution = solve(puzzle.next_tile(current_tile), puzzle)
 
@@ -163,6 +168,7 @@ def solve(current_tile, puzzle):
                         else:
                             # remove this piece/layout and try next (backtrack)
                             puzzle.remove_piece(piece_id, layout_id, current_tile)
+                            print(f"Piece removed: {puzzle.solution}")
                         #print(f"after solve piece - layout {piece_id} - {layout_id}")
             # None of the pieces fits, so we cannot return a solution
             return False, None
