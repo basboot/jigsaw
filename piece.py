@@ -11,35 +11,16 @@ class Piece:
     layouts: list[Layout]
     representation: str
 
-# create a layout from block_matrix by transforming a matrix to have the origin such that there
-# are no blocks in the left upper quadrant
-# TODO: cleanup and rename variables
+# create a layout from a block_matrix by transforming the matrix to have the most left block
+# on the top row as the origin
 def create_layout(block_matrix):
-    # print("----")
-    #
-    # print(block_matrix)
-    #
-    # print(np.amin(block_matrix, axis=0))
+    # get all rows where the y value is equal to the smallest y value (all blocks on the top row)
+    result = np.where(block_matrix[:,1] == np.amin(block_matrix, axis=0)[1])
 
-
-    result = np.where(block_matrix[:,0] == np.amin(block_matrix, axis=0)[0])
-    # print(result)
-
-
-    # now find the smallest y in the results
-    smalllest_x_pos = result[0]
-    # print(smalllest_x_pos)
-
-    y_s = block_matrix[smalllest_x_pos, 1]
-    # print(y_s)
-
-    smallest_y = np.min(y_s)
-    # print(smallest_y)
-
-    smallest_x = block_matrix[smalllest_x_pos[0], 0]
-    # print(smallest_x)
-    #
-    # print(block_matrix - np.array([smallest_x, smallest_y]))
+    # now store the smallest y found (= top row)
+    smallest_y = block_matrix[result[0][0], 1]
+    # and select the smallest x on the top row
+    smallest_x = np.min(block_matrix[result[0], 0])
 
     new_matrix = block_matrix - np.array([smallest_x, smallest_y])
 
@@ -52,7 +33,6 @@ def create_layout(block_matrix):
     # print(f"Layout({points})")
 
     return points
-
 
 # blocks = all blocks!, origin does not have to be 0,0
 def create_piece(blocks, name):
@@ -109,10 +89,14 @@ def create_piece(blocks, name):
 
 
 if __name__ == '__main__':
-    new_piece = create_piece([(1, 1), (1, 2), (1, 3), (2, 3)], 'B')
+    blocks = [(0, 0), (1, 0), (1, -1), (2, -1), (2, -2)]
+    new_piece = create_piece(blocks, 'C')
 
     print("***")
-    print(new_piece)
+    print(blocks)
+    print(">>>")
+    for layout in new_piece.layouts:
+        print(layout)
 
     peters_puzzel_pieces = [
         # 0

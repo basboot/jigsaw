@@ -11,8 +11,8 @@ from piece import *
 # number of blocks of m x n - q the problem reduces to putting all pieces
 # of the puzzle on the board without overlapping.
 
-# If we choose the origin (0, 0) of a layout to have no blocks above or left
-# from it, we can solve the puzzle by trying all pieces to fill the puzzle
+# If we choose the origin (0, 0) to be the most left block on the top row,
+# we can solve the puzzle by trying all pieces to fill the puzzle
 # from top left, to bottom right
 
 # (0, 0) is top left, + is right/down
@@ -133,7 +133,8 @@ class Puzzle:
 
 
 def solve(current_tile, puzzle):
-    print(f"try tile {current_tile}")
+    #print(len(puzzle.solution))
+    #print(f"try tile {current_tile}")
     # No tiles left, so return solution, even if there isn't any
     if not puzzle.has_next_tile(current_tile):
         return puzzle.is_solved(), puzzle.solution
@@ -148,9 +149,9 @@ def solve(current_tile, puzzle):
                 if piece_id in puzzle.solution:
                     continue
                 for layout_id in range(len(puzzle.pieces[piece_id].layouts)):
-                    print(f"try piece - layout {piece_id} - {layout_id}")
+                    #print(f"try piece - layout {piece_id} - {layout_id}")
                     if puzzle.layout_fits(puzzle.pieces[piece_id].layouts[layout_id], current_tile):
-                        print("FIT")
+                        #print("FIT")
                         # piece fits, so use it
                         puzzle.add_piece(piece_id, layout_id, current_tile)
                         # and solve next
@@ -162,7 +163,7 @@ def solve(current_tile, puzzle):
                         else:
                             # remove this piece/layout and try next (backtrack)
                             puzzle.remove_piece(piece_id, layout_id, current_tile)
-                        print(f"after solve piece - layout {piece_id} - {layout_id}")
+                        #print(f"after solve piece - layout {piece_id} - {layout_id}")
             # None of the pieces fits, so we cannot return a solution
             return False, None
 
@@ -182,16 +183,86 @@ if __name__ == '__main__':
     #            Layout([(1, 0), (1, 1), (1, 2)]), Layout([(0, 1), (1, 1), (2, 1)])], 'C')
     # ]
 
-    puzzle_pieces = [
-        create_piece([(0, 0)], 'A'),
-        create_piece([(0, 0), (1, 0), (1, 1)], 'B'),
-        create_piece([(0, 0), (0, 1), (0, 2), (-1, 2)], 'C')
+    # puzzle_pieces = [
+    #     create_piece([(0, 0)], 'A'),
+    #     create_piece([(0, 0), (1, 0), (1, 1)], 'B'),
+    #     create_piece([(0, 0), (0, 1), (0, 2), (-1, 2)], 'C')
+    # ]
+    #
+    # p = Puzzle(3, 3, puzzle_pieces)
+    #
+    # p.invalidate((1, 1))
+    #
+    # print(solve((0, 0), p))
+    # print(p)
+
+    # puzzle_pieces = [
+    #     create_piece([(0, 0), (1, 0), (2, 0), (3, 0)], 'A'),
+    #     create_piece([(0, 0), (1, 0), (2, 0), (2, 1)], 'B'),
+    #     create_piece([(0, 0), (0, 1), (1, 0), (1, 1)], 'C'),
+    #     create_piece([(0, 0), (0, 1)], 'D')
+    # ]
+    # puzzle_pieces = [
+    #     create_piece([(0, 1), (1, 0), (1, 1)], 'A'),
+    #     create_piece([(0, 1), (0, 2), (0, 3)], 'B'),
+    #     create_piece([(0, 0), (1, 0), (2, 0), (3, 0), (0, 1), (1, 1), (2, 1), (0, 2), (1, 2), (0, 3)], 'C'),
+    # ]
+    #
+    # p = Puzzle(4, 4, puzzle_pieces)
+    #
+    # # p.invalidate((3, 2))
+    # # p.invalidate((3, 1))
+    #
+    # print(solve((0, 0), p))
+    # print(p)
+
+    peters_puzzel_pieces = [
+        # 0
+        create_piece([(0, 0), (1, -1), (1, 0), (1, 1), (1, 2)], 'A'),
+        # 1
+        create_piece([(0, 0), (1, 0), (0, 1), (1, 1), (0, 2)], 'B'),
+        # 2
+        create_piece([(0, 0), (1, 0), (1, -1), (2, -1)], 'C'),
+        # 3
+        create_piece([(0, 0), (0, 1), (0, 2), (1, 2), (2, 2)], 'D'),
+        # 4
+        create_piece([(0, 0), (1, 0), (1, -1), (1, 1), (2, 0)], 'E'),
+        # 5
+        create_piece([(0, 0), (1, 0), (1, 1), (1, 2), (0, 2)], 'F'),
+        # 6
+        create_piece([(0, 0), (1, 0), (1, -1), (2, -1), (0, 1)], 'G'),
+        # 7
+        create_piece([(0, 0), (1, 0), (1, -1), (1, 1)], 'H'),
+        # 8
+        create_piece([(0, 0), (0, 1), (1, 1), (2, 1)], 'I'),
+        # 9
+        create_piece([(0, 0), (1, 0), (1, -1), (2, 0), (2, 1)], 'J')
     ]
+    print(peters_puzzel_pieces)
 
-    p = Puzzle(3, 3, puzzle_pieces)
+    peters_puzzel = Puzzle(10, 5, peters_puzzel_pieces)
 
-    p.invalidate((1, 1))
+    peters_puzzel.invalidate((0, 0))
+    peters_puzzel.invalidate((4, 0))
+    peters_puzzel.invalidate((7, 2))
 
-    print(solve((0, 0), p))
-    print(p)
+    print(solve((0, 0), peters_puzzel))
+    print(peters_puzzel)
 
+    # n_blocks = 0
+    # for piece in peters_puzzel_pieces:
+    #     print(piece)
+    #     n_blocks= n_blocks + len(piece.layouts[0].blocks) + 1
+    #
+    # print(f"# blocks {n_blocks}")
+    #
+    # print("show all")
+    # test_puzzel = Puzzle(10, 10, peters_puzzel_pieces)
+    # for i in range(len(test_puzzel.pieces)):
+    #     print(f"layouts # {len(test_puzzel.pieces[i].layouts)}")
+    #     for j in range(len(test_puzzel.pieces[i].layouts)):
+    #         test_puzzel.add_piece(i, j, (4, 4))
+    #         print(test_puzzel)
+    #         test_puzzel.remove_piece(i, j, (4, 4))
+
+    # print(">", create_piece([(0, 0), (1, 0), (1, -1), (2, -1)], 'C'))
