@@ -84,7 +84,7 @@ def create_piece(blocks, name):
 
         # print(used_layouts)
     p = Piece(layouts, name)
-    print(p)
+    # print(p)
     return p
 
 

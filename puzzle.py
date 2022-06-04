@@ -238,13 +238,13 @@ if __name__ == '__main__':
         # 9
         create_piece([(0, 0), (1, 0), (1, -1), (2, 0), (2, 1)], 'J')
     ]
-    print(peters_puzzel_pieces)
+    # print(peters_puzzel_pieces)
 
     peters_puzzel = Puzzle(10, 5, peters_puzzel_pieces)
 
-    peters_puzzel.invalidate((0, 0))
-    peters_puzzel.invalidate((4, 0))
-    peters_puzzel.invalidate((7, 2))
+    peters_puzzel.invalidate((1, 1))
+    peters_puzzel.invalidate((7, 0))
+    peters_puzzel.invalidate((8, 3))
 
     print(solve((0, 0), peters_puzzel))
     print(peters_puzzel)
@@ -255,7 +255,7 @@ if __name__ == '__main__':
     #     n_blocks= n_blocks + len(piece.layouts[0].blocks) + 1
     #
     # print(f"# blocks {n_blocks}")
-    #
+
     # print("show all")
     # test_puzzel = Puzzle(10, 10, peters_puzzel_pieces)
     # for i in range(len(test_puzzel.pieces)):
@@ -264,5 +264,3 @@ if __name__ == '__main__':
     #         test_puzzel.add_piece(i, j, (4, 4))
     #         print(test_puzzel)
     #         test_puzzel.remove_piece(i, j, (4, 4))
-
-    # print(">", create_piece([(0, 0), (1, 0), (1, -1), (2, -1)], 'C'))
