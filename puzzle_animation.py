@@ -4,9 +4,10 @@ from time import sleep
 import pygame as pygame
 
 # game colors
-BACKGROUND = (50, 50, 50)
-BORDER = (150, 150, 150)
-CELL = [(100, 100, 100), (0, 0, 200), (0, 200, 0), (0, 200, 200), (200, 0, 0), (200, 0, 200), (200, 200, 0), (200, 200, 200), (250, 250, 250), (100, 50, 200)]
+BACKGROUND = (219, 211, 123)
+BORDER = (0, 0, 0)
+CELL = [(100, 100, 100), (0, 0, 100), (0, 100, 0), (0, 100, 100), (100, 0, 0),
+        (100, 0, 100), (100, 100, 0), (0, 150, 100), (50, 100, 150), (100, 50, 50)]
 
 # game size
 WINDOW_WIDTH = 500
@@ -34,17 +35,18 @@ class PuzzleAnimation:
     def update(self):
         if SHOW_ANIMATION:
             # draw puzzle
-            font = pygame.font.Font('freesansbold.ttf', 32)
+            font = pygame.font.Font('freesansbold.ttf', 24)
 
 
             self.screen.fill(BACKGROUND)
             for x in range(self.puzzle.m):
                 for y in range(self.puzzle.n):
                     rect = pygame.Rect(x * self.cell_size_x, y * self.cell_size_y, self.cell_size_x, self.cell_size_y)
+                    textrect = pygame.Rect(x * self.cell_size_x + 2, y * self.cell_size_y + 2, self.cell_size_x - 4, self.cell_size_y - 4)
                     pygame.draw.rect(self.screen, BORDER, rect, 1)
                     if self.text is not None:
                         text = font.render(self.text[y][x], True, BORDER, BACKGROUND)
-                        self.screen.blit(text, rect)
+                        self.screen.blit(text, textrect)
 
             for piece_id, layout_position in self.puzzle.solution.items():
                 for block in self.puzzle.pieces[piece_id].layouts[layout_position[0]].blocks + [(0, 0)]:
