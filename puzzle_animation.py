@@ -19,8 +19,9 @@ UPDATE_DELAY = 0.0
 SHOW_ANIMATION = True
 
 class PuzzleAnimation:
-    def __init__(self, puzzle):
+    def __init__(self, puzzle, text=None):
         self.puzzle = puzzle
+        self.text = text
 
         self.cell_size_x = WINDOW_WIDTH / puzzle.m
         self.cell_size_y = WINDOW_HEIGHT / puzzle.n
@@ -34,14 +35,16 @@ class PuzzleAnimation:
         if SHOW_ANIMATION:
             # draw puzzle
             font = pygame.font.Font('freesansbold.ttf', 32)
-            text = font.render('AA', True, BORDER, BACKGROUND)
+
 
             self.screen.fill(BACKGROUND)
             for x in range(self.puzzle.m):
                 for y in range(self.puzzle.n):
                     rect = pygame.Rect(x * self.cell_size_x, y * self.cell_size_y, self.cell_size_x, self.cell_size_y)
                     pygame.draw.rect(self.screen, BORDER, rect, 1)
-                    self.screen.blit(text, rect)
+                    if self.text is not None:
+                        text = font.render(self.text[y][x], True, BORDER, BACKGROUND)
+                        self.screen.blit(text, rect)
 
             for piece_id, layout_position in self.puzzle.solution.items():
                 for block in self.puzzle.pieces[piece_id].layouts[layout_position[0]].blocks + [(0, 0)]:

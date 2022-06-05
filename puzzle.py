@@ -248,16 +248,24 @@ if __name__ == '__main__':
         # 9
         create_piece([(0, 0), (1, 0), (1, -1), (2, 0), (2, 1)], 'J')
     ]
+
+    peters_puzzel_text = [
+        ["ma", "di", "wo", "do", "1", "2", "3", "4", "5", "6"],
+        ["vr", "za", "zo", "7", "8", "9", "10", "11", "12", "13"],
+        ["14", "15", "16", "17", "18", "19", "20", "ja", "fe", "ma"],
+        ["21", "22", "23", "24", "25", "26", "ap", "me", "jn", "jl"],
+        ["27", "28", "29", "30", "31", "au", "se", "ok", "no", "de"]
+    ]
     # print(peters_puzzel_pieces)
 
     peters_puzzel = Puzzle(10, 5, peters_puzzel_pieces)
 
 
     peters_puzzel.invalidate((1, 1))
-    peters_puzzel.invalidate((7, 0))
+    peters_puzzel.invalidate((8, 0))
     peters_puzzel.invalidate((8, 3))
 
-    animation = PuzzleAnimation(peters_puzzel)
+    animation = PuzzleAnimation(peters_puzzel, peters_puzzel_text)
     print(solve((0, 0), peters_puzzel, animation))
     print(peters_puzzel)
 
