@@ -1,22 +1,25 @@
-from piece import *
+# Puzzle: class to store a puzzle, the pieces and helper function to move
+# pieces on the board and solve the puzzle
 
-# A puzzle is a square bord with m x n tiles, which can be empty or occupied
-# A piece of the puzzle is a shape of blocks. Each block can occupy a tile
+# A puzzle is a square board with m x n tiles, which can be empty or occupied.
+# A piece of the puzzle is a shape of blocks. Each block can occupy a tile.
 # Because a piece kan be rotated and flipped it has multiple layouts, which
-# do not have to be unique because of symmetry. Which results in 1 to 8 unique
+# do not have to be unique because of symmetry, which results in 1 to 8 unique
 # layouts per piece.
 
-# The target is to occupy all tiles of the board but some. By invalidating
-# (occupy!) the q tiles that cannot be used, and using pieces with a total
-# number of blocks of m x n - q the problem reduces to putting all pieces
-# of the puzzle on the board without overlapping.
+# The target is to keep a few specified tiles open an occupy all others. By
+# invalidating (occupy) the q tiles that cannot be used beforehand, and using
+# pieces with a total number of blocks of m x n - q the problem reduces to placing
+# all pieces of the puzzle on the board without overlapping.
 
-# If we choose the origin (0, 0) to be the most left block on the top row,
-# we can solve the puzzle by trying all pieces to fill the puzzle
-# from top left, to bottom right
+# If we choose the origin (0, 0) of a piece to be the most left block on the top
+# row, we can solve the puzzle by trying all pieces from top left, to bottom right
+# to fill the puzzle.
 
-# (0, 0) is top left, + is right/down
+# Convention: (0, 0) is top left, + is right/down
 # the origin does not have to be specified in the list of blocks
+
+from piece import *
 from puzzle_animation import PuzzleAnimation
 
 
@@ -77,7 +80,6 @@ class Puzzle:
         return True
 
     def add_piece(self, piece_id, layout_id, tile_origin):
-
         # add origin
         self.occupied.add((tile_origin[0], tile_origin[1]))
         for block in self.pieces[piece_id].layouts[layout_id].blocks:
@@ -137,9 +139,7 @@ class Puzzle:
         return representation
 
 def solve(current_tile, puzzle, animation, all_solutions = False):
-    #print(len(puzzle.solution))
-    #print(f"try tile {current_tile}")
-    # No tiles left, so return a copy of the solution solution, or an empty list if there isn't any
+    # No tiles left, so return a copy of the solution, or an empty list if there isn't any
     if not puzzle.has_next_tile(current_tile):
         return [puzzle.solution.copy()] if puzzle.is_solved() else []
     else:
@@ -148,19 +148,18 @@ def solve(current_tile, puzzle, animation, all_solutions = False):
             return solve(puzzle.next_tile(current_tile), puzzle, animation)
         else:
             # this tile is not occupied, so we try all pieces in all layouts
+            # store all solutions found for this piece (empty list =  no solutions possible)
             solutions = []
             for piece_id in range(len(puzzle.pieces)):
                 # skip pieces already used in the solution
                 if piece_id in puzzle.solution:
                     continue
                 for layout_id in range(len(puzzle.pieces[piece_id].layouts)):
-                    #print(f"try piece - layout {piece_id} - {layout_id}")
                     if puzzle.layout_fits(puzzle.pieces[piece_id].layouts[layout_id], current_tile):
-                        #print("FIT")
                         # piece fits, so use it
                         puzzle.add_piece(piece_id, layout_id, current_tile)
-                        #print(f"Piece added: {puzzle.solution}")
                         animation.update()
+
                         # and solve next
                         solution = solve(puzzle.next_tile(current_tile), puzzle, animation)
 
@@ -174,29 +173,15 @@ def solve(current_tile, puzzle, animation, all_solutions = False):
 
                         # remove this piece/layout and try next (backtrack)
                         puzzle.remove_piece(piece_id, layout_id, current_tile)
-                        #print(f"Piece removed: {puzzle.solution}")
                         animation.update()
 
-                        #print(f"after solve piece - layout {piece_id} - {layout_id}")
-            # None of the pieces fits, so we cannot return a solution
+            # Return all solutions found (could be zero)
             return solutions
 
 
 if __name__ == '__main__':
-    # puzzle_pieces = [
-    #     Piece([Layout([])], 'A'),
-    #     Piece([Layout([(0, 1)]), Layout([(1, 0)])], 'B')
-    # ]
 
-    # puzzle_pieces = [
-    #     Piece([Layout([])], 'A'),
-    #     Piece([Layout([(1, 0), (1, 1)]), Layout([(1, -1), (1, 0)]), Layout([(0, 1), (1, 1)]),
-    #            Layout([(1, 0), (0, 1)])], 'B'),
-    #     Piece([Layout([(0, 1), (0, 2), (-1, 2)]), Layout([(0, 1), (1, 1), (2, 1)]), Layout([(1, 0), (0, 1), (0, 2)]),
-    #            Layout([(1, 0), (2, 0), (2, -1)]), Layout([(0, 1), (0, 2), (1, 2)]), Layout([(1, 0), (2, 0), (2, -1)]),
-    #            Layout([(1, 0), (1, 1), (1, 2)]), Layout([(0, 1), (1, 1), (2, 1)])], 'C')
-    # ]
-
+    # 3 x 3 puzzle, to debug algorithm
     # puzzle_pieces = [
     #     create_piece([(0, 0)], 'A'),
     #     create_piece([(0, 0), (1, 0), (1, 1)], 'B'),
@@ -210,26 +195,7 @@ if __name__ == '__main__':
     # print(solve((0, 0), p))
     # print(p)
 
-    # puzzle_pieces = [
-    #     create_piece([(0, 0), (1, 0), (2, 0), (3, 0)], 'A'),
-    #     create_piece([(0, 0), (1, 0), (2, 0), (2, 1)], 'B'),
-    #     create_piece([(0, 0), (0, 1), (1, 0), (1, 1)], 'C'),
-    #     create_piece([(0, 0), (0, 1)], 'D')
-    # ]
-    # puzzle_pieces = [
-    #     create_piece([(0, 1), (1, 0), (1, 1)], 'A'),
-    #     create_piece([(0, 1), (0, 2), (0, 3)], 'B'),
-    #     create_piece([(0, 0), (1, 0), (2, 0), (3, 0), (0, 1), (1, 1), (2, 1), (0, 2), (1, 2), (0, 3)], 'C'),
-    # ]
-    #
-    # p = Puzzle(4, 4, puzzle_pieces)
-    #
-    # # p.invalidate((3, 2))
-    # # p.invalidate((3, 1))
-    #
-    # print(solve((0, 0), p))
-    # print(p)
-
+    # Peters puzzel https://www.peterspuzzels.nl
     peters_puzzel_pieces = [
         # 0
         create_piece([(0, 0), (1, -1), (1, 0), (1, 1), (1, 2)], 'A'),
@@ -260,10 +226,8 @@ if __name__ == '__main__':
         ["21", "22", "23", "24", "25", "26", "apr", "mei", "jun", "jul"],
         ["27", "28", "29", "30", "31", "aug", "sep", "okt", "nov", "dec"]
     ]
-    # print(peters_puzzel_pieces)
 
     peters_puzzel = Puzzle(10, 5, peters_puzzel_pieces)
-
 
     # ma
     # peters_puzzel.invalidate((0, 0))
@@ -276,27 +240,11 @@ if __name__ == '__main__':
     peters_puzzel.invalidate((8, 3))
 
     animation = PuzzleAnimation(peters_puzzel, peters_puzzel_text)
-    solutions = solve((0, 0), peters_puzzel, animation, False)
-    for i in range(len(solutions)):
+    peters_solutions = solve((0, 0), peters_puzzel, animation, False)
+    for i in range(len(peters_solutions)):
         print(f"solution #{i}")
-        print(solutions[i])
-        peters_puzzel.solution = solutions[i]
+        print(peters_solutions[i])
+        peters_puzzel.solution = peters_solutions[i]
         print(peters_puzzel)
 
     animation.finish()
-
-    # n_blocks = 0
-    # for piece in peters_puzzel_pieces:
-    #     print(piece)
-    #     n_blocks= n_blocks + len(piece.layouts[0].blocks) + 1
-    #
-    # print(f"# blocks {n_blocks}")
-
-    # print("show all")
-    # test_puzzel = Puzzle(10, 10, peters_puzzel_pieces)
-    # for i in range(len(test_puzzel.pieces)):
-    #     print(f"layouts # {len(test_puzzel.pieces[i].layouts)}")
-    #     for j in range(len(test_puzzel.pieces[i].layouts)):
-    #         test_puzzel.add_piece(i, j, (4, 4))
-    #         print(test_puzzel)
-    #         test_puzzel.remove_piece(i, j, (4, 4))
