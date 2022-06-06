@@ -17,7 +17,7 @@ WINDOW_HEIGHT = 250
 # update speed
 UPDATE_DELAY = 0.0
 
-SHOW_ANIMATION = True
+SHOW_ANIMATION = False
 
 class PuzzleAnimation:
     def __init__(self, puzzle, text=None):
@@ -31,6 +31,11 @@ class PuzzleAnimation:
             pygame.init()
             self.screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
             self.clock = pygame.time.Clock()
+
+    def finish(self):
+        if SHOW_ANIMATION:
+            while True:
+                self.update()
 
     def update(self):
         if SHOW_ANIMATION:
