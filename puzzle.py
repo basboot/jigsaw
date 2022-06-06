@@ -136,19 +136,19 @@ class Puzzle:
             representation = f"{representation}\n"
         return representation
 
-
 def solve(current_tile, puzzle, animation):
     #print(len(puzzle.solution))
     #print(f"try tile {current_tile}")
-    # No tiles left, so return solution, even if there isn't any
+    # No tiles left, so return a copy of the solution solution, or an empty list if there isn't any
     if not puzzle.has_next_tile(current_tile):
-        return puzzle.is_solved(), puzzle.solution
+        return [puzzle.solution.copy()] if puzzle.is_solved() else []
     else:
-        # current tile is already occupied, so skip and go to next
+        # current tile is already occupied, so skip and return solution for next tile
         if puzzle.is_occupied(current_tile):
             return solve(puzzle.next_tile(current_tile), puzzle, animation)
         else:
             # this tile is not occupied, so we try all pieces in all layouts
+            solutions = []
             for piece_id in range(len(puzzle.pieces)):
                 # skip pieces already used in the solution
                 if piece_id in puzzle.solution:
@@ -164,17 +164,18 @@ def solve(current_tile, puzzle, animation):
                         # and solve next
                         solution = solve(puzzle.next_tile(current_tile), puzzle, animation)
 
-                        if solution[0]:
+                        if len(solution) > 0:
                             # only return this solution if the puzzle has been solved
-                            return solution
-                        else:
-                            # remove this piece/layout and try next (backtrack)
-                            puzzle.remove_piece(piece_id, layout_id, current_tile)
-                            #print(f"Piece removed: {puzzle.solution}")
-                            animation.update()
+                            return [solution[0]]
+
+                        # remove this piece/layout and try next (backtrack)
+                        puzzle.remove_piece(piece_id, layout_id, current_tile)
+                        #print(f"Piece removed: {puzzle.solution}")
+                        animation.update()
+
                         #print(f"after solve piece - layout {piece_id} - {layout_id}")
             # None of the pieces fits, so we cannot return a solution
-            return False, None
+            return solutions
 
 
 if __name__ == '__main__':
@@ -273,9 +274,7 @@ if __name__ == '__main__':
     animation = PuzzleAnimation(peters_puzzel, peters_puzzel_text)
     print(solve((0, 0), peters_puzzel, animation))
     print(peters_puzzel)
-
-    while True:
-        animation.update()
+    animation.finish()
 
     # n_blocks = 0
     # for piece in peters_puzzel_pieces:
