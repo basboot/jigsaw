@@ -138,62 +138,70 @@ class Puzzle:
             representation = f"{representation}\n"
         return representation
 
-def solve(current_tile, puzzle, animation, all_solutions = False):
-    # No tiles left, so return a copy of the solution, or an empty list if there isn't any
-    if not puzzle.has_next_tile(current_tile):
-        return [puzzle.solution.copy()] if puzzle.is_solved() else []
-    else:
-        # current tile is already occupied, so skip and return solution for next tile
-        if puzzle.is_occupied(current_tile):
-            return solve(puzzle.next_tile(current_tile), puzzle, animation)
+    def solve(self, current_tile, animation, all_solutions = False):
+        # No tiles left, so return a copy of the solution, or an empty list if there isn't any
+        if not self.has_next_tile(current_tile):
+            return [self.solution.copy()] if self.is_solved() else []
         else:
-            # this tile is not occupied, so we try all pieces in all layouts
-            # store all solutions found for this piece (empty list =  no solutions possible)
-            solutions = []
-            for piece_id in range(len(puzzle.pieces)):
-                # skip pieces already used in the solution
-                if piece_id in puzzle.solution:
-                    continue
-                for layout_id in range(len(puzzle.pieces[piece_id].layouts)):
-                    if puzzle.layout_fits(puzzle.pieces[piece_id].layouts[layout_id], current_tile):
-                        # piece fits, so use it
-                        puzzle.add_piece(piece_id, layout_id, current_tile)
-                        animation.update()
+            # current tile is already occupied, so skip and return solution for next tile
+            if self.is_occupied(current_tile):
+                return self.solve(self.next_tile(current_tile), animation)
+            else:
+                # this tile is not occupied, so we try all pieces in all layouts
+                # store all solutions found for this piece (empty list =  no solutions possible)
+                solutions = []
+                for piece_id in range(len(self.pieces)):
+                    # skip pieces already used in the solution
+                    if piece_id in self.solution:
+                        continue
+                    for layout_id in range(len(self.pieces[piece_id].layouts)):
+                        if self.layout_fits(self.pieces[piece_id].layouts[layout_id], current_tile):
+                            # piece fits, so use it
+                            self.add_piece(piece_id, layout_id, current_tile)
+                            animation.update()
 
-                        # and solve next
-                        solution = solve(puzzle.next_tile(current_tile), puzzle, animation)
+                            # and solve next
+                            solution = self.solve(self.next_tile(current_tile), animation)
 
-                        # if we are only interested in one solution, just return the first that is found
-                        if not all_solutions:
-                            if len(solution) > 0:
-                                return [solution[0]]
+                            # if we are only interested in one solution, just return the first that is found
+                            if not all_solutions:
+                                if len(solution) > 0:
+                                    return [solution[0]]
 
-                        # Add new solutions to solutions already found
-                        solutions += solution
+                            # Add new solutions to solutions already found
+                            solutions += solution
 
-                        # remove this piece/layout and try next (backtrack)
-                        puzzle.remove_piece(piece_id, layout_id, current_tile)
-                        animation.update()
+                            # remove this piece/layout and try next (backtrack)
+                            self.remove_piece(piece_id, layout_id, current_tile)
+                            animation.update()
 
-            # Return all solutions found (could be zero)
-            return solutions
+                # Return all solutions found (could be zero)
+                return solutions
 
 
 if __name__ == '__main__':
 
     # 3 x 3 puzzle, to debug algorithm
-    # puzzle_pieces = [
-    #     create_piece([(0, 0)], 'A'),
-    #     create_piece([(0, 0), (1, 0), (1, 1)], 'B'),
-    #     create_piece([(0, 0), (0, 1), (0, 2), (-1, 2)], 'C')
-    # ]
-    #
-    # p = Puzzle(3, 3, puzzle_pieces)
-    #
-    # p.invalidate((1, 1))
-    #
-    # print(solve((0, 0), p))
-    # print(p)
+    puzzle_pieces = [
+        create_piece([(0, 0)], 'A'),
+        create_piece([(0, 0), (1, 0), (1, 1)], 'B'),
+        create_piece([(0, 0), (0, 1), (0, 2), (-1, 2)], 'C')
+    ]
+
+    p = Puzzle(3, 3, puzzle_pieces)
+
+    p.invalidate((0, 0))
+
+    a = PuzzleAnimation(p)
+    s = p.solve((0, 0), a, True)
+    print(s)
+    for i in range(len(s)):
+        print(f"Solution #{i}")
+        p.solution = s[i]
+        print(p)
+    a.finish()
+
+    exit()
 
     # Peters puzzel https://www.peterspuzzels.nl
     peters_puzzel_pieces = [
@@ -240,7 +248,7 @@ if __name__ == '__main__':
     peters_puzzel.invalidate((8, 3))
 
     animation = PuzzleAnimation(peters_puzzel, peters_puzzel_text)
-    peters_solutions = solve((0, 0), peters_puzzel, animation, False)
+    peters_solutions = peters_puzzel.solve((0, 0), animation, False)
     for i in range(len(peters_solutions)):
         print(f"solution #{i}")
         print(peters_solutions[i])
