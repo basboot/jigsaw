@@ -138,7 +138,6 @@ class Puzzle:
 
 
 def solve(current_tile, puzzle, animation):
-
     #print(len(puzzle.solution))
     #print(f"try tile {current_tile}")
     # No tiles left, so return solution, even if there isn't any
@@ -261,8 +260,14 @@ if __name__ == '__main__':
     peters_puzzel = Puzzle(10, 5, peters_puzzel_pieces)
 
 
-    peters_puzzel.invalidate((1, 1))
-    peters_puzzel.invalidate((8, 0))
+    # ma
+    # peters_puzzel.invalidate((0, 0))
+    # peters_puzzel.invalidate((9, 0))
+    # peters_puzzel.invalidate((8, 3))
+
+    # do
+    peters_puzzel.invalidate((3, 0))
+    peters_puzzel.invalidate((5, 1))
     peters_puzzel.invalidate((8, 3))
 
     animation = PuzzleAnimation(peters_puzzel, peters_puzzel_text)
