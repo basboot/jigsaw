@@ -136,7 +136,7 @@ class Puzzle:
             representation = f"{representation}\n"
         return representation
 
-def solve(current_tile, puzzle, animation):
+def solve(current_tile, puzzle, animation, all_solutions = False):
     #print(len(puzzle.solution))
     #print(f"try tile {current_tile}")
     # No tiles left, so return a copy of the solution solution, or an empty list if there isn't any
@@ -164,9 +164,13 @@ def solve(current_tile, puzzle, animation):
                         # and solve next
                         solution = solve(puzzle.next_tile(current_tile), puzzle, animation)
 
-                        if len(solution) > 0:
-                            # only return this solution if the puzzle has been solved
-                            return [solution[0]]
+                        # if we are only interested in one solution, just return the first that is found
+                        if not all_solutions:
+                            if len(solution) > 0:
+                                return [solution[0]]
+
+                        # Add new solutions to solutions already found
+                        solutions += solution
 
                         # remove this piece/layout and try next (backtrack)
                         puzzle.remove_piece(piece_id, layout_id, current_tile)
@@ -272,8 +276,13 @@ if __name__ == '__main__':
     peters_puzzel.invalidate((8, 3))
 
     animation = PuzzleAnimation(peters_puzzel, peters_puzzel_text)
-    print(solve((0, 0), peters_puzzel, animation))
-    print(peters_puzzel)
+    solutions = solve((0, 0), peters_puzzel, animation, False)
+    for i in range(len(solutions)):
+        print(f"solution #{i}")
+        print(solutions[i])
+        peters_puzzel.solution = solutions[i]
+        print(peters_puzzel)
+
     animation.finish()
 
     # n_blocks = 0
