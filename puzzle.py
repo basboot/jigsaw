@@ -138,14 +138,14 @@ class Puzzle:
             representation = f"{representation}\n"
         return representation
 
-    def solve(self, current_tile, animation, all_solutions = False):
+    def solve(self, current_tile, animation, all_solutions=False):
         # No tiles left, so return a copy of the solution, or an empty list if there isn't any
         if not self.has_next_tile(current_tile):
             return [self.solution.copy()] if self.is_solved() else []
         else:
             # current tile is already occupied, so skip and return solution for next tile
             if self.is_occupied(current_tile):
-                return self.solve(self.next_tile(current_tile), animation)
+                return self.solve(self.next_tile(current_tile), animation, all_solutions)
             else:
                 # this tile is not occupied, so we try all pieces in all layouts
                 # store all solutions found for this piece (empty list =  no solutions possible)
@@ -161,7 +161,7 @@ class Puzzle:
                             animation.update()
 
                             # and solve next
-                            solution = self.solve(self.next_tile(current_tile), animation)
+                            solution = self.solve(self.next_tile(current_tile), animation, all_solutions)
 
                             # if we are only interested in one solution, just return the first that is found
                             if not all_solutions:
@@ -181,27 +181,27 @@ class Puzzle:
 
 if __name__ == '__main__':
 
-    # 3 x 3 puzzle, to debug algorithm
-    puzzle_pieces = [
-        create_piece([(0, 0)], 'A'),
-        create_piece([(0, 0), (1, 0), (1, 1)], 'B'),
-        create_piece([(0, 0), (0, 1), (0, 2), (-1, 2)], 'C')
-    ]
-
-    p = Puzzle(3, 3, puzzle_pieces)
-
-    p.invalidate((0, 0))
-
-    a = PuzzleAnimation(p)
-    s = p.solve((0, 0), a, True)
-    print(s)
-    for i in range(len(s)):
-        print(f"Solution #{i}")
-        p.solution = s[i]
-        print(p)
-    a.finish()
-
-    exit()
+    # # 3 x 3 puzzle, to debug algorithm
+    # puzzle_pieces = [
+    #     create_piece([(0, 0)], 'A'),
+    #     create_piece([(0, 0), (1, 0), (1, 1)], 'B'),
+    #     create_piece([(0, 0), (0, 1), (0, 2), (-1, 2)], 'C')
+    # ]
+    #
+    # p = Puzzle(3, 3, puzzle_pieces)
+    #
+    # p.invalidate((0, 0))
+    #
+    # a = PuzzleAnimation(p)
+    # s = p.solve((0, 0), a, True)
+    # print(s)
+    # for i in range(len(s)):
+    #     print(f"Solution #{i}")
+    #     p.solution = s[i]
+    #     print(p)
+    # a.finish()
+    #
+    # exit()
 
     # Peters puzzel https://www.peterspuzzels.nl
     peters_puzzel_pieces = [
