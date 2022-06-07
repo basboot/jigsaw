@@ -21,6 +21,7 @@
 
 from piece import *
 from puzzle_animation import PuzzleAnimation
+import time
 
 
 class Puzzle:
@@ -237,22 +238,26 @@ if __name__ == '__main__':
 
     peters_puzzel = Puzzle(10, 5, peters_puzzel_pieces)
 
-    # ma
-    # peters_puzzel.invalidate((0, 0))
-    # peters_puzzel.invalidate((9, 0))
-    # peters_puzzel.invalidate((8, 3))
+    # create dictionary to find tiles
+    peters_puzzel_lookup = {}
+    for x in range(peters_puzzel.m):
+        for y in range(peters_puzzel.n):
+            peters_puzzel_lookup[peters_puzzel_text[y][x]] = (x, y)
 
-    # do
-    peters_puzzel.invalidate((3, 0))
-    peters_puzzel.invalidate((5, 1))
-    peters_puzzel.invalidate((8, 3))
+    # invalidate a weekday, day and month
+    peters_puzzel.invalidate(peters_puzzel_lookup["di"])
+    peters_puzzel.invalidate(peters_puzzel_lookup["7"])
+    peters_puzzel.invalidate(peters_puzzel_lookup["jun"])
 
     animation = PuzzleAnimation(peters_puzzel, peters_puzzel_text)
-    peters_solutions = peters_puzzel.solve((0, 0), animation, False)
+    start_time = time.time()
+    peters_solutions = peters_puzzel.solve((0, 0), animation, True)
+    running_time = time.time() - start_time
     for i in range(len(peters_solutions)):
         print(f"solution #{i}")
         print(peters_solutions[i])
         peters_puzzel.solution = peters_solutions[i]
         print(peters_puzzel)
 
+    print(f"Found {len(peters_solutions)} solutions in {running_time} seconds")
     animation.finish()
