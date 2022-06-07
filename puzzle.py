@@ -21,7 +21,6 @@
 
 from piece import *
 from puzzle_animation import PuzzleAnimation
-import time
 
 
 class Puzzle:
@@ -139,7 +138,7 @@ class Puzzle:
             representation = f"{representation}\n"
         return representation
 
-    def solve(self, current_tile, animation, all_solutions=False):
+    def solve(self, current_tile, animation=None, all_solutions=False):
         # No tiles left, so return a copy of the solution, or an empty list if there isn't any
         if not self.has_next_tile(current_tile):
             return [self.solution.copy()] if self.is_solved() else []
@@ -159,7 +158,8 @@ class Puzzle:
                         if self.layout_fits(self.pieces[piece_id].layouts[layout_id], current_tile):
                             # piece fits, so use it
                             self.add_piece(piece_id, layout_id, current_tile)
-                            animation.update()
+                            if animation is not None:
+                                animation.update()
 
                             # and solve next
                             solution = self.solve(self.next_tile(current_tile), animation, all_solutions)
@@ -174,90 +174,30 @@ class Puzzle:
 
                             # remove this piece/layout and try next (backtrack)
                             self.remove_piece(piece_id, layout_id, current_tile)
-                            animation.update()
+                            if animation is not None:
+                                animation.update()
 
                 # Return all solutions found (could be zero)
                 return solutions
 
 
 if __name__ == '__main__':
-
-    # # 3 x 3 puzzle, to debug algorithm
-    # puzzle_pieces = [
-    #     create_piece([(0, 0)], 'A'),
-    #     create_piece([(0, 0), (1, 0), (1, 1)], 'B'),
-    #     create_piece([(0, 0), (0, 1), (0, 2), (-1, 2)], 'C')
-    # ]
-    #
-    # p = Puzzle(3, 3, puzzle_pieces)
-    #
-    # p.invalidate((0, 0))
-    #
-    # a = PuzzleAnimation(p)
-    # s = p.solve((0, 0), a, True)
-    # print(s)
-    # for i in range(len(s)):
-    #     print(f"Solution #{i}")
-    #     p.solution = s[i]
-    #     print(p)
-    # a.finish()
-    #
-    # exit()
-
-    # Peters puzzel https://www.peterspuzzels.nl
-    peters_puzzel_pieces = [
-        # 0
-        create_piece([(0, 0), (1, -1), (1, 0), (1, 1), (1, 2)], 'A'),
-        # 1
-        create_piece([(0, 0), (1, 0), (0, 1), (1, 1), (0, 2)], 'B'),
-        # 2
-        create_piece([(0, 0), (1, 0), (1, -1), (2, -1)], 'C'),
-        # 3
-        create_piece([(0, 0), (0, 1), (0, 2), (1, 2), (2, 2)], 'D'),
-        # 4
-        create_piece([(0, 0), (1, 0), (1, -1), (1, 1), (2, 0)], 'E'),
-        # 5
-        create_piece([(0, 0), (1, 0), (1, 1), (1, 2), (0, 2)], 'F'),
-        # 6
-        create_piece([(0, 0), (1, 0), (1, -1), (2, -1), (0, 1)], 'G'),
-        # 7
-        create_piece([(0, 0), (1, 0), (1, -1), (1, 1)], 'H'),
-        # 8
-        create_piece([(0, 0), (0, 1), (1, 1), (2, 1)], 'I'),
-        # 9
-        create_piece([(0, 0), (1, 0), (1, -1), (2, 0), (2, 1)], 'J')
+    # 3 x 3 puzzle, to debug algorithm
+    puzzle_pieces = [
+        create_piece([(0, 0)], 'A'),
+        create_piece([(0, 0), (1, 0), (1, 1)], 'B'),
+        create_piece([(0, 0), (0, 1), (0, 2), (-1, 2)], 'C')
     ]
 
-    peters_puzzel_text = [
-        ["ma", "di", "wo", "do", "1", "2", "3", "4", "5", "6"],
-        ["vr", "za", "zo", "7", "8", "9", "10", "11", "12", "13"],
-        ["14", "15", "16", "17", "18", "19", "20", "jan", "feb", "mrt"],
-        ["21", "22", "23", "24", "25", "26", "apr", "mei", "jun", "jul"],
-        ["27", "28", "29", "30", "31", "aug", "sep", "okt", "nov", "dec"]
-    ]
+    p = Puzzle(3, 3, puzzle_pieces)
 
-    peters_puzzel = Puzzle(10, 5, peters_puzzel_pieces)
+    p.invalidate((0, 0))
 
-    # create dictionary to find tiles
-    peters_puzzel_lookup = {}
-    for x in range(peters_puzzel.m):
-        for y in range(peters_puzzel.n):
-            peters_puzzel_lookup[peters_puzzel_text[y][x]] = (x, y)
-
-    # invalidate a weekday, day and month
-    peters_puzzel.invalidate(peters_puzzel_lookup["di"])
-    peters_puzzel.invalidate(peters_puzzel_lookup["7"])
-    peters_puzzel.invalidate(peters_puzzel_lookup["jun"])
-
-    animation = PuzzleAnimation(peters_puzzel, peters_puzzel_text)
-    start_time = time.time()
-    peters_solutions = peters_puzzel.solve((0, 0), animation, True)
-    running_time = time.time() - start_time
-    for i in range(len(peters_solutions)):
-        print(f"solution #{i}")
-        print(peters_solutions[i])
-        peters_puzzel.solution = peters_solutions[i]
-        print(peters_puzzel)
-
-    print(f"Found {len(peters_solutions)} solutions in {running_time} seconds")
-    animation.finish()
+    a = PuzzleAnimation(p)
+    s = p.solve((0, 0), a, True)
+    print(s)
+    for i in range(len(s)):
+        print(f"Solution #{i}")
+        p.solution = s[i]
+        print(p)
+    a.finish()
