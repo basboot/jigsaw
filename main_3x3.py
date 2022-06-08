@@ -13,9 +13,9 @@ if __name__ == '__main__':
 
     p = Puzzle(3, 3, puzzle_pieces)
 
-    p.invalidate((0, 0))
+    p.invalidate((2, 1))
 
-    s = p.solve((0, 0))
+    s = p.solve()
     print(s)
     for i in range(len(s)):
         print(f"Solution #{i}")

@@ -138,14 +138,14 @@ class Puzzle:
             representation = f"{representation}\n"
         return representation
 
-    def solve(self, current_tile, animation=None, all_solutions=False):
+    def solve(self, animation=None, all_solutions=False, current_tile=(0, 0)):
         # No tiles left, so return a copy of the solution, or an empty list if there isn't any
         if not self.has_next_tile(current_tile):
             return [self.solution.copy()] if self.is_solved() else []
         else:
             # current tile is already occupied, so skip and return solution for next tile
             if self.is_occupied(current_tile):
-                return self.solve(self.next_tile(current_tile), animation, all_solutions)
+                return self.solve(animation, all_solutions, self.next_tile(current_tile))
             else:
                 # this tile is not occupied, so we try all pieces in all layouts
                 # store all solutions found for this piece (empty list =  no solutions possible)
@@ -162,7 +162,7 @@ class Puzzle:
                                 animation.update()
 
                             # and solve next
-                            solution = self.solve(self.next_tile(current_tile), animation, all_solutions)
+                            solution = self.solve(animation, all_solutions, self.next_tile(current_tile))
 
                             # if we are only interested in one solution, just return the first that is found
                             if not all_solutions:

@@ -48,14 +48,14 @@ if __name__ == '__main__':
             peters_puzzel_lookup[peters_puzzel_text[y][x]] = (x, y)
 
     # Invalidate a weekday, day and month
-    peters_puzzel.invalidate(peters_puzzel_lookup["di"])
-    peters_puzzel.invalidate(peters_puzzel_lookup["7"])
+    peters_puzzel.invalidate(peters_puzzel_lookup["do"])
+    peters_puzzel.invalidate(peters_puzzel_lookup["9"])
     peters_puzzel.invalidate(peters_puzzel_lookup["jun"])
 
     # Solve the puzzle
     animation = PuzzleAnimation(peters_puzzel, peters_puzzel_text)
     start_time = time.time()
-    peters_solutions = peters_puzzel.solve((0, 0), animation, False)
+    peters_solutions = peters_puzzel.solve(animation=animation, all_solutions=False)
     running_time = time.time() - start_time
 
     # Show results
